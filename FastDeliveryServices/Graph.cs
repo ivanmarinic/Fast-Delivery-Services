@@ -11,6 +11,8 @@ namespace FastDeliveryServices
 
         private List<int>[] adjList;
 
+        List<string> returnValues = new List<string>();
+
         public Graph(int vertices)
         {
 
@@ -34,43 +36,45 @@ namespace FastDeliveryServices
             adjList[u].Add(v);
         }
 
-        public List<int> printAllPaths(int s, int d)
+        public List<string> printAllPaths(int s, int d)
         {
             bool[] isVisited = new bool[v];
             List<int> pathList = new List<int>();
 
             pathList.Add(s);
 
-            return printAllPathsUtil(s, d, isVisited, pathList);
+            List<string> returnPossiblePaths = printAllPathsUtil(s, d, isVisited, pathList);
+
+            return returnPossiblePaths;
         }
 
-        private List<int> printAllPathsUtil(int u, int d,
+        private List<string> printAllPathsUtil(int u, int d,
                                        bool[] isVisited,
                                        List<int> localPathList)
         {
-
             if (u.Equals(d))
             {
-                Console.WriteLine(string.Join(" ", localPathList));
-                return localPathList;
+                returnValues.Add(string.Join(" ", localPathList));
             }
-
-            isVisited[u] = true;
-
-            foreach (int i in adjList[u])
+            else
             {
-                if (!isVisited[i])
+                isVisited[u] = true;
+
+                foreach (int i in adjList[u])
                 {
-                    localPathList.Add(i);
-                    printAllPathsUtil(i, d, isVisited,
-                                      localPathList);
+                    if (!isVisited[i])
+                    {
+                        localPathList.Add(i);
+                        printAllPathsUtil(i, d, isVisited,
+                                          localPathList);
 
-                    localPathList.Remove(i);
+                        localPathList.Remove(i);
+                    }
                 }
-            }
 
-            isVisited[u] = false;
-            return new List<int>();
+                isVisited[u] = false;
+            }
+            return returnValues;
         }
     }
 }

@@ -12,7 +12,7 @@ using Persistence;
 
 namespace FastDeliveryServices.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/fad/[controller]")]
     [ApiController]
     public class FlightsController : ControllerBase
     {
@@ -27,14 +27,6 @@ namespace FastDeliveryServices.Controllers
             configuration = builder.Build();
         }
 
-        [HttpGet]
-        public List<Airport> Get()
-        {
-            ConnectDb db = new ConnectDb(configuration);
-
-            return db.GetAirports();
-        }
-
 
         [HttpPost]
         public async Task<ActionResult<Flight>> Post(string IATAFrom, string IATATo)
@@ -47,10 +39,10 @@ namespace FastDeliveryServices.Controllers
             }
             catch (Exception)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Error");
+                return this.StatusCode(StatusCodes.Status400BadRequest, new JsonResult(new { Status = "ERROR", Message = "Unknown IATA Code", NewFlights = "0" }));
             }
 
-            return this.StatusCode(StatusCodes.Status200OK, "Success");
+            return this.StatusCode(StatusCodes.Status200OK, new JsonResult(new { Status = "OK", Message = "Thank you for using FAD services", NewFlights = "1" }));
         }
 
         [HttpDelete]
@@ -62,12 +54,12 @@ namespace FastDeliveryServices.Controllers
 
                 db.DeleteFlights(IATAFrom, IATATo);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Error");
+                return this.StatusCode(StatusCodes.Status500InternalServerError, new JsonResult(new { Status = "ERROR", Message = ex}));
             }
 
-            return this.StatusCode(StatusCodes.Status200OK, "Success");
+            return this.StatusCode(StatusCodes.Status204NoContent);
         }
     }
 }
